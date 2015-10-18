@@ -28,99 +28,105 @@ __resource__ = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' ) )
 __temp__ = xbmc.translatePath( os.path.join( __profile__, 'temp','') ).decode("utf-8")
 sys.path.append (__resource__)
 def Search(item):
-    urlgetid="http://www.subspedia.tv/API/getAllSeries.php"
-    urlgetsub="http://www.subspedia.tv/API/getBySerie.php?serie="
-    idserie=0
-    linkdownload=""
-    eptitolo=""  
-    response = urllib2.urlopen(urlgetid)
-    data = json.loads(response.read())
-    for series in data:
-        if item['tvshow']==series["nome_serie"]:
-            idserie=series["id_serie"]
-    if idserie!=0:
-        urlgetsub=urlgetsub+str(idserie)
-        response = urllib2.urlopen(urlgetsub)
-        data=json.loads(response.read())
-        for season in data:
-            num_stagione=str(season["num_stagione"])
-            num_episodio=str(season["num_episodio"])
-            if (item['season']==num_stagione)and(item['episode']==num_episodio):
-                eptitolo=season["ep_titolo"]
-                linkdownload=season["link_file"]
-        if linkdownload!="":
-            log("Fetching subtitles using url %s" % linkdownload)
-            content= urllib2.urlopen(linkdownload).read()
-            if content:
-                log('File downloaded')
-                if xbmcvfs.exists(__temp__):
-                    shutil.rmtree(__temp__)
-                    log("elimino temp")
-                xbmcvfs.mkdirs(__temp__)
-                log("ricreo temp")
-                local_tmp_file = os.path.join(__temp__, 'subspedia.xxx')
-                try:
-                    log("Saving subtitles to '%s'" % local_tmp_file)
-                    local_file_handle = open(local_tmp_file, 'wb')
-                    local_file_handle.write(content)
-                    local_file_handle.close()
-                    #Check archive type (rar/zip/else) through the file header (rar=Rar!, zip=PK)
-                    myfile = open(local_tmp_file, 'rb')
-                    myfile.seek(0)
-                    if myfile.read(1) == 'R':
-                        typeid = 'rar'
-                        packed = True
-                        log('Discovered RAR Archive')
-                    else:
+    if 'ita' in item['3let_language'] and item['tvshow']:
+        urlgetid="http://www.subspedia.tv/API/getAllSeries.php"
+        urlgetsub="http://www.subspedia.tv/API/getBySerie.php?serie="
+        idserie=0
+        linkdownload=""
+        eptitolo=""  
+        response = urllib2.urlopen(urlgetid)
+        data = json.loads(response.read())
+        for series in data:
+            if item['tvshow']==series["nome_serie"]:
+                idserie=series["id_serie"]
+        if idserie!=0:
+            urlgetsub=urlgetsub+str(idserie)
+            response = urllib2.urlopen(urlgetsub)
+            data=json.loads(response.read())
+            for season in data:
+                num_stagione=str(season["num_stagione"])
+                num_episodio=str(season["num_episodio"])
+                if (item['season']==num_stagione)and(item['episode']==num_episodio):
+                    eptitolo=season["ep_titolo"]
+                    linkdownload=season["link_file"]
+            if linkdownload!="":
+                log("Fetching subtitles using url %s" % linkdownload)
+                content= urllib2.urlopen(linkdownload).read()
+                if content:
+                    log('File downloaded')
+                    if xbmcvfs.exists(__temp__):
+                        shutil.rmtree(__temp__)
+                        log("elimino temp")
+                    xbmcvfs.mkdirs(__temp__)
+                    log("ricreo temp")
+                    local_tmp_file = os.path.join(__temp__, 'subspedia.xxx')
+                    try:
+                        log("Saving subtitles to '%s'" % local_tmp_file)
+                        local_file_handle = open(local_tmp_file, 'wb')
+                        local_file_handle.write(content)
+                        local_file_handle.close()
+                        #Check archive type (rar/zip/else) through the file header (rar=Rar!, zip=PK)
+                        myfile = open(local_tmp_file, 'rb')
                         myfile.seek(0)
-                        if myfile.read(1) == 'P':
-                            typeid = 'zip'
+                        if myfile.read(1) == 'R':
+                            typeid = 'rar'
                             packed = True
-                            log('Discovered ZIP Archive')
+                            log('Discovered RAR Archive')
                         else:
                             myfile.seek(0)
-                            typeid = 'srt'
-                            packed = False
-                            log('Discovered a non-archive file')
-                    myfile.close()
-                    local_tmp_file = os.path.join(__temp__, 'subspedia.' + typeid)
-                    os.rename(os.path.join(__temp__, 'subspedia.xxx'), local_tmp_file)
-                    log("Saving to %s" % local_tmp_file)
-                except:
-                    #log("Failed to save subtitle to %s" % local_tmp_file)
-                    return []
-                if packed:
-                    xbmc.sleep(500)
-                    dirtemp=__temp__ +"unpack"
-                    log("dirtemp %s "%dirtemp)
-                    if not os.path.exists(dirtemp):
-                        os.makedirs(dirtemp)
+                            if myfile.read(1) == 'P':
+                                typeid = 'zip'
+                                packed = True
+                                log('Discovered ZIP Archive')
+                            else:
+                                myfile.seek(0)
+                                typeid = 'srt'
+                                packed = False
+                                log('Discovered a non-archive file')
+                        myfile.close()
+                        local_tmp_file = os.path.join(__temp__, 'subspedia.' + typeid)
+                        os.rename(os.path.join(__temp__, 'subspedia.xxx'), local_tmp_file)
+                        log("Saving to %s" % local_tmp_file)
+                    except:
+                        #log("Failed to save subtitle to %s" % local_tmp_file)
+                        return []
+                    if packed:
+                        xbmc.sleep(500)
+                        dirtemp=__temp__ +"unpack"
+                        log("dirtemp %s "%dirtemp)
+                        if not os.path.exists(dirtemp):
+                            os.makedirs(dirtemp)
+                        else:
+                            shutil.rmtree(dirtemp)
+                            os.makedirs(dirtemp)
+                        xbmc.executebuiltin(('XBMC.Extract(' + local_tmp_file + ',' + dirtemp +')').encode('utf-8'), True)
+                        dirs = os.listdir(dirtemp)
+                        for file in dirs:
+                            filen=file.replace("subspedia","")
+                            filen=file.replace("Subspedia","")
+                            filen=filen.replace(".srt","")
+                            filen=filen.replace("."," ")
+                            listitem = xbmcgui.ListItem(label="Italian",label2=filen,thumbnailImage='it')
+                            listitem.setProperty( "sync",'false')                
+                            listitem.setProperty('hearing_imp', 'false') # set to "true" if subtitle is for hearing impared              
+                            url = "plugin://%s/?action=download&file=%s&type=%s" % (__scriptid__, file,"pack")
+                            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False)
+                        
                     else:
-                        shutil.rmtree(dirtemp)
-                        os.makedirs(dirtemp)
-                    xbmc.executebuiltin(('XBMC.Extract(' + local_tmp_file + ',' + dirtemp +')').encode('utf-8'), True)
-                    dirs = os.listdir(dirtemp)
-                    for file in dirs:
-                        filen=file.replace("subspedia","")
-                        filen=file.replace("Subspedia","")
-                        filen=filen.replace(".srt","")
-                        filen=filen.replace("."," ")
-                        listitem = xbmcgui.ListItem(label="Italian",label2=filen,thumbnailImage='it')
+                        labeltitle=item['tvshow']+" "+item['season']+"x"+item['episode']+" "+eptitolo
+                        listitem = xbmcgui.ListItem(label="Italian",label2=labeltitle,thumbnailImage='it')
                         listitem.setProperty( "sync",'false')                
                         listitem.setProperty('hearing_imp', 'false') # set to "true" if subtitle is for hearing impared              
-                        url = "plugin://%s/?action=download&file=%s&type=%s" % (__scriptid__, file,"pack")
+                        url = "plugin://%s/?action=download&file=%s&type=%s" % (__scriptid__,local_tmp_file,"unpack")
                         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False)
-                    
                 else:
-                    listitem = xbmcgui.ListItem(label="Italian",label2=eptitolo,thumbnailImage='it')
-                    listitem.setProperty( "sync",'false')                
-                    listitem.setProperty('hearing_imp', 'false') # set to "true" if subtitle is for hearing impared              
-                    url = "plugin://%s/?action=download&file=%s&type=%s" % (__scriptid__,local_tmp_file,"unpack")
-                    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False)
-            else:
-                log('Failed to download the file')
-                return []  
-            
+                    log('Failed to download the file')
+                    return []  
+    else:
+        notify(__language__(32001))
+        log('Subspedia only works with italian subs. Skipped')
+def notify(msg):
+    xbmc.executebuiltin((u'Notification(%s,%s)' % (__scriptname__ , msg)).encode('utf-8'))            
 def Download(link,type):
     subtitle_list = []
     if type=="pack":
