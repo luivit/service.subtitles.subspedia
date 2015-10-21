@@ -31,14 +31,16 @@ def Search(item):
     if 'ita' in item['3let_language'] and item['tvshow']:
         urlgetid="http://www.subspedia.tv/API/getAllSeries.php"
         urlgetsub="http://www.subspedia.tv/API/getBySerie.php?serie="
-        idserie=0
+        idserie=checkexp(item['tvshow'])
         linkdownload=""
         eptitolo=""  
+        log("tvshow %s" % item['tvshow'])
         response = urllib2.urlopen(urlgetid)
         data = json.loads(response.read())
-        for series in data:
-            if item['tvshow']==series["nome_serie"]:
-                idserie=series["id_serie"]
+        if idserie==0:
+            for series in data:
+                if item['tvshow']==series["nome_serie"]:
+                    idserie=series["id_serie"]
         if idserie!=0:
             urlgetsub=urlgetsub+str(idserie)
             response = urllib2.urlopen(urlgetsub)
@@ -106,6 +108,7 @@ def Search(item):
                             filen=file.replace("Subspedia","")
                             filen=filen.replace(".srt","")
                             filen=filen.replace("."," ")
+                            filen=filen.replace("_"," ")
                             listitem = xbmcgui.ListItem(label="Italian",label2=filen,thumbnailImage='it')
                             listitem.setProperty( "sync",'false')                
                             listitem.setProperty('hearing_imp', 'false') # set to "true" if subtitle is for hearing impared              
@@ -125,6 +128,12 @@ def Search(item):
     else:
         notify(__language__(32001))
         log('Subspedia only works with italian subs. Skipped')
+def checkexp(tvshow):
+    exp=[["Marvel's Agents of S.H.I.E.L.D.",5],["Marvel's Daredevil",246]]
+    for expl in exp:
+        if tvshow == expl[0]:
+            return expl[1]
+    return 0
 def notify(msg):
     xbmc.executebuiltin((u'Notification(%s,%s)' % (__scriptname__ , msg)).encode('utf-8'))            
 def Download(link,type):
