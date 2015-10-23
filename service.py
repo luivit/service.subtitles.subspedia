@@ -13,6 +13,7 @@ import xbmcplugin
 import shutil
 import unicodedata
 import json
+import re
 from fileinput import filename
 
 __addon__ = xbmcaddon.Addon()
@@ -40,6 +41,7 @@ def Search(item):
         if idserie==0:
             for series in data:
                 if item['tvshow']==series["nome_serie"]:
+                if item['tvshow'].lower()==series['nome_serie'].lower():
                     idserie=series["id_serie"]
         if idserie!=0:
             urlgetsub=urlgetsub+str(idserie)
@@ -204,8 +206,23 @@ if params['action'] == 'search':
         item['file_original_path'] = stackPath[0][8:]
   
     Search(item)  
-    
-elif params['action'] == 'download' or params['action'] == 'manualsearch':
+elif params['action'] == 'manualsearch':
+    res=re.findall('(.*?)(\d{1,3})x(\d{1,3})', urllib.unquote(params['searchstring']), re.IGNORECASE)
+    if res:
+        item = {}
+        item['tvshow']=res[0][0]
+        lres=len(item['tvshow'])
+        if item['tvshow'][lres-1:lres]==" ":
+            item['tvshow']=item['tvshow'][0:lres-1]
+        item['season']=res[0][1]
+        item['episode']=res[0][2]
+        item['3let_language']=[]
+        for lang in urllib.unquote(params['languages']).decode('utf-8').split(","):
+            item['3let_language'].append(xbmc.convertLanguage(lang,xbmc.ISO_639_2))
+        Search(item) 
+    else:
+        notify(__language__(32002))      
+elif params['action'] == 'download':
     ## we pickup all our arguments sent from def Search()
     subs = Download(params["file"],params["type"])
     ## we can return more than one subtitle for multi CD versions, for now we are still working out how to handle that in XBMC core
