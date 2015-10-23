@@ -35,12 +35,10 @@ def Search(item):
         idserie=checkexp(item['tvshow'])
         linkdownload=""
         eptitolo=""  
-        log("tvshow %s" % item['tvshow'])
         response = urllib2.urlopen(urlgetid)
         data = json.loads(response.read())
         if idserie==0:
             for series in data:
-                if item['tvshow']==series["nome_serie"]:
                 if item['tvshow'].lower()==series['nome_serie'].lower():
                     idserie=series["id_serie"]
         if idserie!=0:
@@ -108,6 +106,7 @@ def Search(item):
                         for file in dirs:
                             filen=file.replace("subspedia","")
                             filen=file.replace("Subspedia","")
+                            filen=filen.replace("Subspedia","")
                             filen=filen.replace(".srt","")
                             filen=filen.replace("."," ")
                             filen=filen.replace("_"," ")
@@ -130,14 +129,17 @@ def Search(item):
     else:
         notify(__language__(32001))
         log('Subspedia only works with italian subs. Skipped')
+
 def checkexp(tvshow):
     exp=[["Marvel's Agents of S.H.I.E.L.D.",5],["Marvel's Daredevil",246]]
     for expl in exp:
         if tvshow == expl[0]:
             return expl[1]
     return 0
+    
 def notify(msg):
     xbmc.executebuiltin((u'Notification(%s,%s)' % (__scriptname__ , msg)).encode('utf-8'))            
+
 def Download(link,type):
     subtitle_list = []
     if type=="pack":
