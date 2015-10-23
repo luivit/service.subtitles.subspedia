@@ -41,6 +41,7 @@ def Search(item):
             for series in data:
                 if item['tvshow'].lower()==series['nome_serie'].lower():
                     idserie=series["id_serie"]
+                    break
         if idserie!=0:
             urlgetsub=urlgetsub+str(idserie)
             response = urllib2.urlopen(urlgetsub)
@@ -51,6 +52,7 @@ def Search(item):
                 if (item['season']==num_stagione)and(item['episode']==num_episodio):
                     eptitolo=season["ep_titolo"]
                     linkdownload=season["link_file"]
+                    break
             if linkdownload!="":
                 log("Fetching subtitles using url %s" % linkdownload)
                 content= urllib2.urlopen(linkdownload).read()
@@ -105,7 +107,6 @@ def Search(item):
                         dirs = os.listdir(dirtemp)
                         for file in dirs:
                             filen=file.replace("subspedia","")
-                            filen=file.replace("Subspedia","")
                             filen=filen.replace("Subspedia","")
                             filen=filen.replace(".srt","")
                             filen=filen.replace("."," ")
