@@ -126,7 +126,13 @@ def Search(item):
                         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False)
                 else:
                     log('Failed to download the file')
-                    return []  
+                    return []
+            else:
+                notify(__language__(32004))
+                log('Subs not found')
+        else:
+            notify(__language__(32003))
+            log('Tvshow not found')
     else:
         notify(__language__(32001))
         log('Subspedia only works with italian subs. Skipped')
