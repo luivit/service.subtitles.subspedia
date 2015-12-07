@@ -15,6 +15,7 @@
     <summary lang="it">Addon sottotitoli Subspedia</summary>
     <description lang="it">Trova e scarica sottotitoli da subspedia.tv</description>
 	<language>it</language>
+	<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
 	<website>http://www.subspedia.tv/</website>
 	<forum>http://forum.kodi.tv/showthread.php?tid=244195</forum>
     <source>https://github.com/luivit/service.subtitles.subspedia</source> 
