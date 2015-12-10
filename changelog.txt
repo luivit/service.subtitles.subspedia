@@ -1,3 +1,4 @@
+- fix for some TV show
 0.0.5
 - added notifications
 0.0.4
