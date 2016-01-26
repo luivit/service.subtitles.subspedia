@@ -1,4 +1,5 @@
 0.0.7
+- updated xbmc.python version
 - updated layout language
 - general bugfix
 - fix for some TV show
