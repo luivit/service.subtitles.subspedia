@@ -1,5 +1,6 @@
 0.0.7
 - fix for some TV show
+- fix for some TV show
 0.0.6
 - fix for some TV show
 0.0.5
