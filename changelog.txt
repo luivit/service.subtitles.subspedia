@@ -1,4 +1,5 @@
 0.0.7
+- updated layout language
 - general bugfix
 - fix for some TV show
 0.0.7 (2016-01-19)
