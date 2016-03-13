@@ -1,3 +1,4 @@
+1.0.1 (2016-03-13)
 - added support for automatic search of videos without title metadata
 1.0.0 (2016-02-26)
 - updated xbmc.python version
