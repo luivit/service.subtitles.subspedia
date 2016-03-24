@@ -60,9 +60,9 @@ def Search(item):
                     log('File downloaded')
                     if xbmcvfs.exists(__temp__):
                         shutil.rmtree(__temp__)
-                        log("elimino temp")
+                        #log("elimino temp")
                     xbmcvfs.mkdirs(__temp__)
-                    log("ricreo temp")
+                    #log("ricreo temp")
                     local_tmp_file = os.path.join(__temp__, 'subspedia.xxx')
                     try:
                         log("Saving subtitles to '%s'" % local_tmp_file)
@@ -97,7 +97,7 @@ def Search(item):
                     if packed:
                         xbmc.sleep(500)
                         dirtemp=__temp__ +"unpack"
-                        log("dirtemp %s "%dirtemp)
+                        #log("dirtemp %s "%dirtemp)
                         if not os.path.exists(dirtemp):
                             os.makedirs(dirtemp)
                         else:
@@ -106,7 +106,7 @@ def Search(item):
                         xbmc.executebuiltin(('XBMC.Extract(' + local_tmp_file + ',' + dirtemp +')').encode('utf-8'), True)
                         dirs = os.listdir(dirtemp)
                         for file in dirs:
-                            filen=clean_name(file)      
+                            filen=cleanName(file)      
                             url = "plugin://%s/?action=download&file=%s&type=%s" % (__scriptid__, file,"pack")
                             xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=make_listItem(filen),isFolder=False)
                         
@@ -156,7 +156,7 @@ def parseSearchString(str):
         item['episode']=res[0][2]
     return item
 
-def clean_name(file):
+def cleanName(file):
     filen=file.replace("subspedia","")
     filen=filen.replace("Subspedia","")
     filen=filen.replace(".srt","")
@@ -197,8 +197,6 @@ def get_params():
     return param
 
 params = get_params()
-
-print params
 
 
 if params['action'] == 'search':
