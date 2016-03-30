@@ -106,9 +106,16 @@ def Search(item):
                         xbmc.executebuiltin(('XBMC.Extract(' + local_tmp_file + ',' + dirtemp +')').encode('utf-8'), True)
                         dirs = os.listdir(dirtemp)
                         for file in dirs:
-                            filen=cleanName(file)      
-                            url = "plugin://%s/?action=download&file=%s&type=%s" % (__scriptid__, file,"pack")
-                            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=make_listItem(filen),isFolder=False)
+                            if (os.path.isdir(dirtemp+"\\"+file) and file!="__MACOSX" ):
+                                dirs_rec = os.listdir(dirtemp+"\\"+file)
+                                for file_rec in dirs_rec:
+                                    filen=cleanName(file_rec)
+                                    url = "plugin://%s/?action=download&file=%s&type=%s" % (__scriptid__,file+"\\"+file_rec,"pack")
+                                    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=make_listItem(filen),isFolder=False)
+                            elif(file!="__MACOSX"):
+                                filen=cleanName(file)      
+                                url = "plugin://%s/?action=download&file=%s&type=%s" % (__scriptid__, file,"pack")
+                                xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=make_listItem(filen),isFolder=False)
                         
                     else:
                         labeltitle=item['tvshow']+" "+item['season']+"x"+item['episode']+" "+eptitolo            
